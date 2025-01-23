@@ -1,42 +1,47 @@
 ﻿namespace Tennis;
 
-public class TennisGame3 : ITennisGame
+public class TennisGame3(string player1Name, string player2Name) : ITennisGame
 {
-    private int p2;
-    private int p1;
-    private string p1N;
-    private string p2N;
+    private int _player2Score;
+    private int _player1Score;
 
-    public TennisGame3(string player1Name, string player2Name)
-    {
-        this.p1N = player1Name;
-        this.p2N = player2Name;
-    }
+    private readonly string _player1Name = player1Name;
+    private readonly string _player2Name = player2Name;
+
+    private static readonly string[] _pointsNames = ["Love", "Fifteen", "Thirty", "Forty"];
 
     public string GetScore()
     {
-        string s;
-        if ((p1 < 4 && p2 < 4) && (p1 + p2 < 6))
+        bool scoresLevel = _player1Score == _player2Score;
+        if (scoresLevel)
         {
-            string[] p = { "Love", "Fifteen", "Thirty", "Forty" };
-            s = p[p1];
-            return (p1 == p2) ? s + "-All" : s + "-" + p[p2];
+            return _player1Score switch
+            {
+                >= 3 => "Deuce",
+                _ => _pointsNames[_player1Score] + "-All",
+            };
+        }
+
+        bool isEndgame = _player1Score >= 4 || _player2Score >= 4;
+        if (isEndgame)
+        {
+            string leader = _player1Score > _player2Score ? _player1Name : _player2Name;
+            bool gameFinished = Math.Abs(_player1Score - _player2Score) > 1;
+
+            return gameFinished ? "Win for " + leader : "Advantage " + leader;
         }
         else
         {
-            if (p1 == p2)
-                return "Deuce";
-            s = p1 > p2 ? p1N : p2N;
-            return ((p1 - p2) * (p1 - p2) == 1) ? "Advantage " + s : "Win for " + s;
+            return _pointsNames[_player1Score] + "-" + _pointsNames[_player2Score];
         }
     }
 
     public void WonPoint(string playerName)
     {
-        if (playerName == "player1")
-            this.p1 += 1;
+        if (playerName == _player1Name)
+            _player1Score += 1;
         else
-            this.p2 += 1;
+            _player2Score += 1;
     }
 
 }
