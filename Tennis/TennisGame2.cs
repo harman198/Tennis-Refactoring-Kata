@@ -1,138 +1,78 @@
 ﻿namespace Tennis;
 
-public class TennisGame2 : ITennisGame
+public class TennisGame2(string player1Name, string player2Name) : ITennisGame
 {
-    private int p1point;
-    private int p2point;
+    private int _player1Score = 0;
+    private int _player2Score;
 
-    private string p1res = "";
-    private string p2res = "";
-    private string player1Name;
-    private string player2Name;
-
-    public TennisGame2(string player1Name, string player2Name)
-    {
-        this.player1Name = player1Name;
-        p1point = 0;
-        this.player2Name = player2Name;
-    }
+    private string _player1Name = player1Name;
+    private string _player2Name = player2Name;
 
     public string GetScore()
     {
-        var score = "";
-        if (p1point == p2point && p1point < 3)
+        if (_player1Score == _player2Score && _player1Score < 3)
         {
-            if (p1point == 0)
-                score = "Love";
-            if (p1point == 1)
-                score = "Fifteen";
-            if (p1point == 2)
-                score = "Thirty";
-            score += "-All";
+            return _player1Score switch
+            {
+                0 => "Love-All",
+                1 => "Fifteen-All",
+                _ => "Thirty-All",
+            };
         }
-        if (p1point == p2point && p1point > 2)
-            score = "Deuce";
-
-        if (p1point > 0 && p2point == 0)
+        if (_player1Score == _player2Score && _player1Score > 2)
         {
-            if (p1point == 1)
-                p1res = "Fifteen";
-            if (p1point == 2)
-                p1res = "Thirty";
-            if (p1point == 3)
-                p1res = "Forty";
-
-            p2res = "Love";
-            score = p1res + "-" + p2res;
+            return "Deuce";
         }
-        if (p2point > 0 && p1point == 0)
+        if (_player1Score > 0 && _player1Score < 4 && _player2Score == 0)
         {
-            if (p2point == 1)
-                p2res = "Fifteen";
-            if (p2point == 2)
-                p2res = "Thirty";
-            if (p2point == 3)
-                p2res = "Forty";
-
-            p1res = "Love";
-            score = p1res + "-" + p2res;
+            return GetScoreName(_player1Score) + "-Love";
         }
-
-        if (p1point > p2point && p1point < 4)
+        if (_player2Score > 0 && _player2Score < 4 && _player1Score == 0)
         {
-            if (p1point == 2)
-                p1res = "Thirty";
-            if (p1point == 3)
-                p1res = "Forty";
-            if (p2point == 1)
-                p2res = "Fifteen";
-            if (p2point == 2)
-                p2res = "Thirty";
-            score = p1res + "-" + p2res;
+            return "Love-" + GetScoreName(_player2Score);
         }
-        if (p2point > p1point && p2point < 4)
+        if (_player1Score >= 4 && _player2Score >= 0 && (_player1Score - _player2Score) >= 2)
         {
-            if (p2point == 2)
-                p2res = "Thirty";
-            if (p2point == 3)
-                p2res = "Forty";
-            if (p1point == 1)
-                p1res = "Fifteen";
-            if (p1point == 2)
-                p1res = "Thirty";
-            score = p1res + "-" + p2res;
+            return $"Win for {_player1Name}";
         }
-
-        if (p1point > p2point && p2point >= 3)
+        if (_player2Score >= 4 && _player1Score >= 0 && (_player2Score - _player1Score) >= 2)
         {
-            score = "Advantage player1";
+            return $"Win for {_player2Name}";
         }
-
-        if (p2point > p1point && p1point >= 3)
+        if (_player1Score > _player2Score && _player2Score >= 3)
         {
-            score = "Advantage player2";
+            return $"Advantage {_player1Name}";
         }
-
-        if (p1point >= 4 && p2point >= 0 && (p1point - p2point) >= 2)
+        if (_player2Score > _player1Score && _player1Score >= 3)
         {
-            score = "Win for player1";
+            return $"Advantage {_player2Name}";
         }
-        if (p2point >= 4 && p1point >= 0 && (p2point - p1point) >= 2)
-        {
-            score = "Win for player2";
-        }
-        return score;
+        return GetScoreName(_player1Score) + "-" + GetScoreName(_player2Score);
     }
 
-    public void SetP1Score(int number)
+    private static string GetScoreName(int score)
     {
-        for (int i = 0; i < number; i++)
+        return score switch
         {
-            P1Score();
-        }
-    }
-
-    public void SetP2Score(int number)
-    {
-        for (var i = 0; i < number; i++)
-        {
-            P2Score();
-        }
+            1 => "Fifteen",
+            2 => "Thirty",
+            _ => "Forty",
+        };
     }
 
     private void P1Score()
     {
-        p1point++;
+        _player1Score++;
     }
 
     private void P2Score()
     {
-        p2point++;
+        _player2Score++;
     }
 
-    public void WonPoint(string player)
+    public void WonPoint(string playerName)
     {
-        if (player == "player1")
+        if (playerName == _player1Name)
             P1Score();
         else
             P2Score();
